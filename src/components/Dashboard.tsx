@@ -2,6 +2,7 @@ import { RiskIndicator } from "./RiskIndicator";
 import { ClimateMetrics } from "./ClimateMetrics";
 import { ForecastChart } from "./ForecastChart";
 import { LocationSelector } from "./LocationSelector";
+import { NavigationBar } from "./NavigationBar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -52,6 +53,9 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+      {/* Navigation Bar */}
+      <NavigationBar />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div 
