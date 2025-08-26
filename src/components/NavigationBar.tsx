@@ -75,7 +75,7 @@ export const NavigationBar = () => {
   const currentLanguage = languages.find(lang => lang.code === language);
 
   return (
-    <nav className="bg-card/95 backdrop-blur-sm border-b border-border shadow-sm sticky top-0 z-50">
+    <nav className="bg-primary/10 backdrop-blur-md border-b border-primary/20 shadow-climate sticky top-0 z-50 transition-all duration-300">
       <div className="container mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           {/* Logo/Brand */}
@@ -89,25 +89,25 @@ export const NavigationBar = () => {
           {/* Navigation Items */}
           <div className="flex items-center gap-2">
             {/* Dashboard */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </Button>
 
             {/* Disaster */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
               <AlertTriangle className="h-4 w-4" />
               <span className="hidden sm:inline">Disaster</span>
             </Button>
 
             {/* Location */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
               <MapPin className="h-4 w-4" />
               <span className="hidden sm:inline">Location</span>
             </Button>
 
             {/* Settings */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Settings</span>
             </Button>
@@ -115,7 +115,7 @@ export const NavigationBar = () => {
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+                <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
                   <Globe className="h-4 w-4" />
                   <span className="hidden sm:inline">{currentLanguage?.native}</span>
                 </Button>
@@ -127,7 +127,7 @@ export const NavigationBar = () => {
                   <DropdownMenuItem
                     key={lang.code}
                     onClick={() => handleLanguageSelect(lang.code)}
-                    className={`${language === lang.code ? 'bg-accent' : ''} cursor-pointer`}
+                    className={`${language === lang.code ? 'bg-primary/20' : ''} cursor-pointer hover:bg-primary/20`}
                   >
                     <div className="flex flex-col">
                       <span className="font-medium">{lang.native}</span>
@@ -141,7 +141,7 @@ export const NavigationBar = () => {
             {/* Profile */}
             <Popover open={isProfileOpen} onOpenChange={setIsProfileOpen}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 hover:bg-accent">
+                <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
                   <Avatar className="h-6 w-6">
                     <AvatarImage src={user?.avatar} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
