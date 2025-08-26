@@ -27,6 +27,7 @@ import {
   Camera
 } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { useTranslation } from '@/contexts/TranslationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const languages = [
@@ -39,8 +40,10 @@ const languages = [
 
 export const NavigationBar = () => {
   const { user, updateProfile, language, setLanguage } = useUser();
+  const { t } = useTranslation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [editForm, setEditForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -89,27 +92,55 @@ export const NavigationBar = () => {
           {/* Navigation Items */}
           <div className="flex items-center gap-2">
             {/* Dashboard */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
+                activeTab === 'dashboard' ? 'bg-primary/20 text-primary' : ''
+              }`}
+              onClick={() => setActiveTab('dashboard')}
+            >
               <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+              <span className="hidden sm:inline">{t('dashboard')}</span>
             </Button>
 
             {/* Disaster */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
+                activeTab === 'disaster' ? 'bg-primary/20 text-primary' : ''
+              }`}
+              onClick={() => setActiveTab('disaster')}
+            >
               <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">Disaster</span>
+              <span className="hidden sm:inline">{t('disaster')}</span>
             </Button>
 
             {/* Location */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
+                activeTab === 'location' ? 'bg-primary/20 text-primary' : ''
+              }`}
+              onClick={() => setActiveTab('location')}
+            >
               <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Location</span>
+              <span className="hidden sm:inline">{t('location')}</span>
             </Button>
 
             {/* Settings */}
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
+                activeTab === 'settings' ? 'bg-primary/20 text-primary' : ''
+              }`}
+              onClick={() => setActiveTab('settings')}
+            >
               <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Settings</span>
+              <span className="hidden sm:inline">{t('settings')}</span>
             </Button>
 
             {/* Language Selector */}
@@ -120,8 +151,8 @@ export const NavigationBar = () => {
                   <span className="hidden sm:inline">{currentLanguage?.native}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-sm border-primary/20">
+                <DropdownMenuLabel>{t('selectLanguage')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {languages.map((lang) => (
                   <DropdownMenuItem
@@ -148,14 +179,14 @@ export const NavigationBar = () => {
                       {user?.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden sm:inline">Profile</span>
+                  <span className="hidden sm:inline">{t('profile')}</span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-80">
+              <PopoverContent align="end" className="w-80 bg-background/95 backdrop-blur-sm border-primary/20">
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">User Profile</CardTitle>
+                      <CardTitle className="text-base">{t('userProfile')}</CardTitle>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -199,7 +230,7 @@ export const NavigationBar = () => {
                     {isEditing ? (
                       <div className="space-y-3">
                         <div>
-                          <Label htmlFor="name" className="text-xs">Name</Label>
+                          <Label htmlFor="name" className="text-xs">{t('name')}</Label>
                           <Input
                             id="name"
                             value={editForm.name}
@@ -208,7 +239,7 @@ export const NavigationBar = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="email" className="text-xs">Email</Label>
+                          <Label htmlFor="email" className="text-xs">{t('email')}</Label>
                           <Input
                             id="email"
                             value={editForm.email}
@@ -217,7 +248,7 @@ export const NavigationBar = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="phone" className="text-xs">Phone</Label>
+                          <Label htmlFor="phone" className="text-xs">{t('phone')}</Label>
                           <Input
                             id="phone"
                             value={editForm.phone}
@@ -226,7 +257,7 @@ export const NavigationBar = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="location" className="text-xs">Location</Label>
+                          <Label htmlFor="location" className="text-xs">{t('location')}</Label>
                           <Input
                             id="location"
                             value={editForm.location}
@@ -236,7 +267,7 @@ export const NavigationBar = () => {
                         </div>
                         <div className="flex gap-2">
                           <Button size="sm" onClick={handleProfileSave} className="flex-1">
-                            Save
+                            {t('save')}
                           </Button>
                           <Button 
                             size="sm" 
@@ -244,22 +275,22 @@ export const NavigationBar = () => {
                             onClick={() => setIsEditing(false)}
                             className="flex-1"
                           >
-                            Cancel
+                            {t('cancel')}
                           </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Phone:</span>
+                          <span className="text-muted-foreground">{t('phone')}:</span>
                           <span>{user?.phone}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Location:</span>
+                          <span className="text-muted-foreground">{t('location')}:</span>
                           <span className="text-right flex-1 ml-2">{user?.location}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Language:</span>
+                          <span className="text-muted-foreground">{t('selectLanguage')}:</span>
                           <span>{currentLanguage?.name}</span>
                         </div>
                       </div>

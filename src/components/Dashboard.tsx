@@ -9,6 +9,7 @@ import { RefreshCw } from "lucide-react";
 import { AlertNotifications } from "./AlertNotifications";
 import { PDFExport } from "./PDFExport";
 import { useWeather } from "@/contexts/WeatherContext";
+import { useTranslation } from "@/contexts/TranslationContext";
 import climateHero from "@/assets/climate-hero.jpg";
 import { 
   calculateFloodRisk, 
@@ -23,6 +24,7 @@ import { getLocationSpecificEmergencyContacts } from "@/utils/emergencyContacts"
 
 export const Dashboard = () => {
   const { weatherData, airQualityData, currentLocation, refreshWeather, loading } = useWeather();
+  const { t } = useTranslation();
 
   // Calculate dynamic risk assessments
   const floodRisk = calculateFloodRisk(weatherData);
@@ -65,9 +67,9 @@ export const Dashboard = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary-glow/80" />
           <div className="relative flex h-full items-center justify-center px-6">
             <div className="text-center text-white">
-              <h1 className="text-4xl font-bold mb-2">AI Climate Risk Prediction</h1>
+              <h1 className="text-4xl font-bold mb-2">{t('climateRiskPrediction')}</h1>
               <p className="text-lg opacity-90">
-                Advanced forecasting for flood, heatwave, and pollution risks
+                {t('advancedForecasting')}
               </p>
             </div>
           </div>
@@ -78,8 +80,8 @@ export const Dashboard = () => {
         {/* Header Controls */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold">Climate Risk Dashboard</h2>
-            <p className="text-muted-foreground">Real-time monitoring and 7-day forecasts</p>
+            <h2 className="text-2xl font-bold">{t('climateRiskDashboard')}</h2>
+            <p className="text-muted-foreground">{t('realTimeMonitoring')}</p>
           </div>
           <div className="flex gap-2">
             <Button 
@@ -90,7 +92,7 @@ export const Dashboard = () => {
               disabled={loading}
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              {loading ? 'Refreshing...' : 'Refresh Data'}
+              {loading ? t('refreshing') : t('refreshData')}
             </Button>
             <AlertNotifications />
             <PDFExport />
@@ -104,7 +106,7 @@ export const Dashboard = () => {
 
         {/* Current Risk Indicators */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Current Risk Assessment</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('currentRiskAssessment')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <RiskIndicator
               level={floodRisk.level}
@@ -126,27 +128,27 @@ export const Dashboard = () => {
 
         {/* Climate Metrics */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Current Conditions</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('currentConditions')}</h3>
           <ClimateMetrics />
         </div>
 
         {/* Forecast Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
           <ForecastChart
-            title="Flood Risk Forecast"
-            description="7-day probability analysis"
+            title={t('floodRiskForecast')}
+            description={t('sevenDayAnalysis')}
             data={floodData}
             riskType="flood"
           />
           <ForecastChart
-            title="Heatwave Prediction"
-            description="Temperature-based risk assessment"
+            title={t('heatwavePrediction')}
+            description={t('temperatureBasedRisk')}
             data={heatwaveData}
             riskType="heatwave"
           />
           <ForecastChart
-            title="Air Quality Index"
-            description="Pollution level predictions"
+            title={t('airQualityIndex')}
+            description={t('pollutionLevelPredictions')}
             data={pollutionData}
             riskType="pollution"
           />
@@ -156,11 +158,11 @@ export const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Emergency Contacts</CardTitle>
+              <CardTitle>{t('emergencyContacts')}</CardTitle>
               <CardDescription>
                 {currentLocation?.name ? 
-                  `Emergency numbers for ${currentLocation.name}, ${currentLocation.country}` : 
-                  'Important numbers for climate emergencies'
+                  `${t('emergencyNumbersFor')} ${currentLocation.name}, ${currentLocation.country}` : 
+                  t('importantNumbers')
                 }
               </CardDescription>
             </CardHeader>
@@ -179,11 +181,11 @@ export const Dashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recommended Actions</CardTitle>
+              <CardTitle>{t('recommendedActions')}</CardTitle>
               <CardDescription>
                 {currentLocation?.name ? 
-                  `Actions for ${currentLocation.name} based on current conditions` : 
-                  'Based on current risk levels'
+                  `${t('actionsFor')} ${currentLocation.name} ${t('basedOnCurrentConditions')}` : 
+                  t('basedOnCurrentRisk')
                 }
               </CardDescription>
             </CardHeader>

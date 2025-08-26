@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useWeather } from "@/contexts/WeatherContext";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 export const LocationSelector = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { currentLocation, weatherData, setLocationByCity, loading } = useWeather();
+  const { t } = useTranslation();
   
   const displayLocation = currentLocation || {
-    name: weatherData?.location || "Unknown Location",
+    name: weatherData?.location || t('locationNotAvailable'),
     country: weatherData?.country || "",
     lat: 0,
     lon: 0,
@@ -39,7 +41,7 @@ export const LocationSelector = () => {
             <MapPin className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold">Current Location</h3>
+            <h3 className="font-semibold">{t('currentLocation')}</h3>
             <p className="text-foreground font-medium">
               {displayLocation.name}
               {displayLocation.country && `, ${displayLocation.country}`}
@@ -48,10 +50,10 @@ export const LocationSelector = () => {
               {currentLocation ? (
                 <>
                   <Navigation className="inline h-3 w-3 mr-1" />
-                  Auto-detected location
+                  {t('autoDetectedLocation')}
                 </>
               ) : (
-                "Location not available"
+                t('locationNotAvailable')
               )}
             </p>
           </div>
@@ -62,7 +64,7 @@ export const LocationSelector = () => {
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search for a city..."
+              placeholder={t('searchForCity')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -70,7 +72,7 @@ export const LocationSelector = () => {
             />
           </div>
           <Button type="submit" disabled={loading || !searchQuery.trim()}>
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? t('searching') : t('search')}
           </Button>
         </form>
         
@@ -78,11 +80,11 @@ export const LocationSelector = () => {
         {currentLocation && (
           <div className="p-3 bg-muted/50 rounded-lg">
             <p className="text-sm">
-              <span className="font-medium">Coordinates:</span> {formatCoordinates(currentLocation.lat, currentLocation.lon)}
+              <span className="font-medium">{t('coordinates')}:</span> {formatCoordinates(currentLocation.lat, currentLocation.lon)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               <Navigation className="inline h-3 w-3 mr-1" />
-              Detected from your device location
+              {t('detectedFromDevice')}
             </p>
           </div>
         )}
@@ -90,7 +92,7 @@ export const LocationSelector = () => {
         {loading && (
           <div className="p-3 bg-muted/50 rounded-lg text-center">
             <p className="text-sm text-muted-foreground">
-              Loading location data...
+              {t('loadingLocationData')}
             </p>
           </div>
         )}
