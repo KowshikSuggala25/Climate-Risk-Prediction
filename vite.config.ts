@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
+  build: {
+    chunkSizeWarningLimit: 1600, 
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
