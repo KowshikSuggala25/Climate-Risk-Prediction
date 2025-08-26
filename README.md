@@ -1,73 +1,137 @@
-# Welcome to your Lovable project
+# AI for Climate Risk Prediction
 
-## Project info
+An AI-powered system to predict climate-related risks such as floods, heatwaves, and air pollution spikes at the community level. The project provides localized forecasts, risk dashboards, and actionable alerts to help communities prepare and mitigate the impacts of climate change.
 
-**URL**: https://lovable.dev/projects/2eafa87e-a33a-4dff-8fc9-916b41c11910
+## Table of Contents
 
-## How can I edit this code?
+* [Overview](#overview)
+* [Challenge Statement](#challenge-statement)
+* [Core Features](#core-features)
+* [Tech Stack](#tech-stack)
+* [Example Use Case](#example-use-case)
+* [Impact](#impact)
+* [Getting Started](#getting-started)
+* [Screenshots / Demo](#screenshots--demo)
+* [Contributing](#contributing)
+* [License](#license)
 
-There are several ways of editing your application.
+## Overview
 
-**Use Lovable**
+Climate change is driving increasingly frequent and severe disasters:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2eafa87e-a33a-4dff-8fc9-916b41c11910) and start prompting.
+* Floods caused by heavy rainfall and poor drainage
+* Extreme heatwaves affecting health and productivity
+* Air pollution spikes worsening respiratory diseases
 
-Changes made via Lovable will be committed automatically to this repo.
+### The Problem
 
-**Use your preferred IDE**
+* Existing warning systems are often generic and lack local insights
+* Predictions are reactive rather than preventive
+* Limited use of AI/ML with weather and historical climate data
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### The Solution
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+This project introduces an AI-based Climate Risk Prediction System that provides:
 
-Follow these steps:
+* Localized risk forecasts (short-term and seasonal)
+* Power BI dashboards for visualization and monitoring
+* Actionable alerts via email and SMS
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Challenge Statement
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Develop an AI-based system that predicts climate-related risks (floods, heatwaves, air pollution spikes) at a community level and provides actionable insights for preparedness and mitigation.
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Core Features
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Data Integration
+
+* Integration of OpenWeather API for real-time weather data
+* Use of open datasets such as NASA Climate Data, NOAA, AQI, and Kaggle climate datasets
+
+### AI/ML Models
+
+* Risk predictions for short-term (1–7 days) and long-term (seasonal) horizons
+* Example predictive models:
+
+  * Flood risk prediction using rainfall and soil saturation
+  * Heatwave prediction using temperature, humidity, and wind speed
+  * Air pollution spike prediction using AQI and weather patterns
+* Algorithms include Random Forest, XGBoost, LSTM, GRU, and Transformers
+
+### Visualization
+
+* Power BI dashboards to display risk levels (Low, Medium, High)
+* Forecast trends with confidence scores
+* Zone-based risk segmentation
+
+### Alerts
+
+* Automated alerts delivered via Email and SMS
+* Preparedness recommendations for authorities and citizens
+
+## Tech Stack
+
+* **AI/ML:** Python, Scikit-learn, TensorFlow, PyTorch, Prophet
+* **Data Sources:** OpenWeather API, NASA Climate Data, NOAA, AQI datasets, Kaggle
+* **Visualization:** Power BI
+* **Deployment:** Google Cloud Platform (GCP)
+
+## Example Use Case
+
+A city prone to monsoon flooding:
+
+1. Historical rainfall and soil saturation data from the past 10 years are processed.
+2. The OpenWeather API reports an expected 200 mm of rainfall tomorrow.
+3. The AI model predicts a "High Flood Risk" in three zones.
+4. The Power BI dashboard and Email/SMS alerts notify:
+
+   * Prepare flood barriers in Zone 4
+   * Avoid travel in areas where waterlogging is expected
+   * Flood probability is estimated to be 60% higher compared to last week
+5. Local authorities and citizens can take preventive action before the disaster strikes.
+
+## Impact
+
+This solution directly supports the following United Nations Sustainable Development Goals (SDGs):
+
+* SDG 11: Sustainable Cities and Communities
+* SDG 13: Climate Action
+* SDG 3: Good Health and Well-being
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/KowshikSuggala25/Climate-Risk-Prediction.git
+cd Climate-Risk-Prediction
 ```
 
-**Edit a file directly in GitHub**
+### 2. Install dependencies
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+pip install -r requirements.txt
+```
 
-**Use GitHub Codespaces**
+### 3. Run the model
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+python main.py
+```
 
-## What technologies are used for this project?
+### 4. View results
 
-This project is built with:
+Open the Power BI reports to explore predictions and risk levels.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Screenshots / Demo
 
-## How can I deploy this project?
+(Add visuals of your Power BI dashboards or model outputs here.)
 
-Simply open [Lovable](https://lovable.dev/projects/2eafa87e-a33a-4dff-8fc9-916b41c11910) and click on Share -> Publish.
+## Contributing
 
-## Can I connect a custom domain to my Lovable project?
+Contributions are welcome. To contribute:
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Fork the repository
+2. Create a new branch (`feature/new-feature`)
+3. Commit your changes
+4. Open a Pull Request
