@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -41,9 +42,10 @@ const languages = [
 export const NavigationBar = () => {
   const { user, updateProfile, language, setLanguage } = useUser();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
   const [editForm, setEditForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -77,6 +79,16 @@ export const NavigationBar = () => {
 
   const currentLanguage = languages.find((lang) => lang.code === language);
 
+  const getActiveTab = () => {
+    switch (location.pathname) {
+      case "/": return "dashboard";
+      case "/disaster": return "disaster";
+      case "/location": return "location";
+      case "/settings": return "settings";
+      default: return "dashboard";
+    }
+  };
+
   return (
     <nav className="bg-primary/10 backdrop-blur-md border-b border-primary/20 shadow-climate sticky top-0 z-50 transition-all duration-300">
       <div className="container mx-auto px-6 py-3">
@@ -98,9 +110,9 @@ export const NavigationBar = () => {
               variant="ghost"
               size="sm"
               className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                activeTab === "dashboard" ? "bg-primary/20 text-primary" : ""
+                getActiveTab() === "dashboard" ? "bg-primary/20 text-primary" : ""
               }`}
-              onClick={() => setActiveTab("dashboard")}
+              onClick={() => navigate("/")}
             >
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">{t("dashboard")}</span>
@@ -111,9 +123,9 @@ export const NavigationBar = () => {
               variant="ghost"
               size="sm"
               className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                activeTab === "disaster" ? "bg-primary/20 text-primary" : ""
+                getActiveTab() === "disaster" ? "bg-primary/20 text-primary" : ""
               }`}
-              onClick={() => setActiveTab("disaster")}
+              onClick={() => navigate("/disaster")}
             >
               <AlertTriangle className="h-4 w-4" />
               <span className="hidden sm:inline">{t("disaster")}</span>
@@ -124,9 +136,9 @@ export const NavigationBar = () => {
               variant="ghost"
               size="sm"
               className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                activeTab === "location" ? "bg-primary/20 text-primary" : ""
+                getActiveTab() === "location" ? "bg-primary/20 text-primary" : ""
               }`}
-              onClick={() => setActiveTab("location")}
+              onClick={() => navigate("/location")}
             >
               <MapPin className="h-4 w-4" />
               <span className="hidden sm:inline">{t("location")}</span>
@@ -137,9 +149,9 @@ export const NavigationBar = () => {
               variant="ghost"
               size="sm"
               className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                activeTab === "settings" ? "bg-primary/20 text-primary" : ""
+                getActiveTab() === "settings" ? "bg-primary/20 text-primary" : ""
               }`}
-              onClick={() => setActiveTab("settings")}
+              onClick={() => navigate("/settings")}
             >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">{t("settings")}</span>

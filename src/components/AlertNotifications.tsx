@@ -36,6 +36,9 @@ export const AlertNotifications = () => {
   React.useEffect(() => {
     if (!weatherData || !airQualityData || !currentLocation) return;
 
+    // Only generate new alerts if we don't have any yet
+    if (alerts.length > 0) return;
+
     const newAlerts: WeatherAlert[] = [];
     const now = new Date();
 
@@ -113,10 +116,42 @@ export const AlertNotifications = () => {
   const recentAlerts = alerts.filter(alert => alert.timestamp <= new Date());
   const upcomingAlerts = alerts.filter(alert => alert.timestamp > new Date());
 
+  const handleDialogOpen = () => {
+    setIsOpen(true);
+    // Mark all unread alerts as read when dialog opens
+    setAlerts(prev => prev.map(alert => ({ ...alert, isRead: true })));
+  };
+
+  // Generate new alerts periodically (simulating real-time alerts)
+  React.useEffect(() => {
+    if (alerts.length === 0) return;
+
+    const interval = setInterval(() => {
+      // Randomly generate new alerts
+      if (Math.random() > 0.7) { // 30% chance every 30 seconds
+        const now = new Date();
+        const newAlert: WeatherAlert = {
+          id: `new-${now.getTime()}`,
+          type: "general",
+          severity: Math.random() > 0.5 ? "medium" : "low",
+          title: "Weather Update",
+          message: "New weather conditions detected in your area.",
+          timestamp: now,
+          isRead: false,
+          location: `${currentLocation?.name}, ${currentLocation?.country}`
+        };
+        
+        setAlerts(prev => [newAlert, ...prev].slice(0, 10)); // Keep max 10 alerts
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [alerts.length, currentLocation]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="relative">
+        <Button variant="outline" className="relative" onClick={handleDialogOpen}>
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
             <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-xs">
