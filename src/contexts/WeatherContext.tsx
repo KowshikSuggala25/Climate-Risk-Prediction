@@ -1,7 +1,19 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { weatherService, WeatherData, AirQualityData, LocationData } from '@/services/weatherService';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { useToast } from '@/hooks/use-toast';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import {
+  weatherService,
+  WeatherData,
+  AirQualityData,
+  LocationData,
+} from "@/services/weatherService";
+import { locationService } from "@/services/locationService";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { useToast } from "@/hooks/use-toast";
 
 interface WeatherContextType {
   weatherData: WeatherData | null;
@@ -19,7 +31,7 @@ const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 export const useWeather = () => {
   const context = useContext(WeatherContext);
   if (!context) {
-    throw new Error('useWeather must be used within a WeatherProvider');
+    throw new Error("useWeather must be used within a WeatherProvider");
   }
   return context;
 };
@@ -28,14 +40,20 @@ interface WeatherProviderProps {
   children: ReactNode;
 }
 
-export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) => {
+export const WeatherProvider: React.FC<WeatherProviderProps> = ({
+  children,
+}) => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
+  const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(
+    null
+  );
+  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   const { latitude, longitude, error: geoError } = useGeolocation();
   const { toast } = useToast();
 
@@ -54,12 +72,13 @@ export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) =>
       setAirQualityData(airQuality);
       setCurrentLocation(location);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch weather data';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch weather data";
       setError(errorMessage);
       toast({
-        title: 'Weather Error',
+        title: "Weather Error",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -81,18 +100,26 @@ export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) =>
 
       const locations = await weatherService.searchLocations(cityName);
       if (locations.length === 0) {
-        throw new Error('City not found');
+        throw new Error("City not found");
       }
 
       const location = locations[0];
       await fetchWeatherData(location.lat, location.lon);
+
+      // Save location to database if user is authenticated
+      try {
+        await locationService.saveLocation(location);
+      } catch (error) {
+        console.log("User not authenticated, skipping location save");
+      }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch weather for city';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch weather for city";
       setError(errorMessage);
       toast({
-        title: 'Location Error',
+        title: "Location Error",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -101,6 +128,14 @@ export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) =>
 
   const setLocationByCoordinates = async (lat: number, lon: number) => {
     await fetchWeatherData(lat, lon);
+
+    // Save location to database if user is authenticated
+    try {
+      const location = await weatherService.reverseGeocode(lat, lon);
+      await locationService.saveLocation(location);
+    } catch (error) {
+      console.log("User not authenticated or failed to save location");
+    }
   };
 
   // Initialize provider
@@ -120,9 +155,9 @@ export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) =>
     if (geoError && isInitialized) {
       setError(`Geolocation error: ${geoError}`);
       toast({
-        title: 'Location Access',
+        title: "Location Access",
         description: geoError,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   }, [geoError, toast, isInitialized]);
@@ -144,8 +179,6 @@ export const WeatherProvider: React.FC<WeatherProviderProps> = ({ children }) =>
   }
 
   return (
-    <WeatherContext.Provider value={value}>
-      {children}
-    </WeatherContext.Provider>
+    <WeatherContext.Provider value={value}>{children}</WeatherContext.Provider>
   );
 };

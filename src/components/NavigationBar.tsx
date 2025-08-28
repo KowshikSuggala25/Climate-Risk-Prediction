@@ -1,91 +1,42 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/contexts/TranslationContext";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Menu,
+  MapPin,
+  AlertTriangle,
+  Home,
+  Settings,
+  Globe,
+  LogOut,
+  User,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  LayoutDashboard,
-  AlertTriangle,
-  MapPin,
-  Settings,
-  Globe,
-  User,
-  Edit,
-  Camera,
-} from "lucide-react";
-import { useUser } from "@/contexts/UserContext";
-import { useTranslation } from "@/contexts/TranslationContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const languages = [
-  { code: "english", name: "English", native: "English" },
-  { code: "telugu", name: "Telugu", native: "తెలుగు" },
-  { code: "hindi", name: "Hindi", native: "हिंदी" },
-  { code: "tamil", name: "Tamil", native: "தமிழ்" },
-  { code: "malayalam", name: "Malayalam", native: "മലയാളം" },
-];
 
 export const NavigationBar = () => {
-  const { user, updateProfile, language, setLanguage } = useUser();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { t, language } = useTranslation();
+  const { user, signOut } = useAuth();
   const location = useLocation();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    location: user?.location || "",
-  });
-
-  const handleLanguageSelect = (langCode: string) => {
-    setLanguage(langCode);
-    if (user) {
-      updateProfile({ language: langCode });
-    }
-  };
-
-  const handleProfileSave = () => {
-    updateProfile(editForm);
-    setIsEditing(false);
-  };
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        updateProfile({ avatar: result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const currentLanguage = languages.find((lang) => lang.code === language);
 
   const getActiveTab = () => {
     switch (location.pathname) {
-      case "/": return "dashboard";
-      case "/disaster": return "disaster";
-      case "/location": return "location";
-      case "/settings": return "settings";
-      default: return "dashboard";
+      case "/":
+        return "dashboard";
+      case "/disaster":
+        return "disaster";
+      case "/location":
+        return "location";
+      case "/settings":
+        return "settings";
+      default:
+        return "dashboard";
     }
   };
 
@@ -99,289 +50,122 @@ export const NavigationBar = () => {
               <AlertTriangle className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-foreground">
-              Climatic AI
+              Climate Prediction
             </span>
           </div>
 
           {/* Navigation Items */}
           <div className="flex items-center gap-2">
             {/* Dashboard */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                getActiveTab() === "dashboard" ? "bg-primary/20 text-primary" : ""
-              }`}
-              onClick={() => navigate("/")}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("dashboard")}</span>
-            </Button>
+            <Link to="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`gap-2 hover:bg-primary/20 hover:text-primary transition-all duration-200 ${
+                  getActiveTab() === "dashboard"
+                    ? "bg-primary/20 text-primary"
+                    : ""
+                }`}
+              >
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("dashboard")}</span>
+              </Button>
+            </Link>
 
             {/* Disaster */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                getActiveTab() === "disaster" ? "bg-primary/20 text-primary" : ""
-              }`}
-              onClick={() => navigate("/disaster")}
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("disaster")}</span>
-            </Button>
+            <Link to="/disaster">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`gap-2 hover:bg-primary/20 hover:text-primary transition-all duration-200 ${
+                  getActiveTab() === "disaster"
+                    ? "bg-primary/20 text-primary"
+                    : ""
+                }`}
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("disaster")}</span>
+              </Button>
+            </Link>
 
             {/* Location */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                getActiveTab() === "location" ? "bg-primary/20 text-primary" : ""
-              }`}
-              onClick={() => navigate("/location")}
-            >
-              <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("location")}</span>
-            </Button>
+            <Link to="/location">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`gap-2 hover:bg-primary/20 hover:text-primary transition-all duration-200 ${
+                  getActiveTab() === "location"
+                    ? "bg-primary/20 text-primary"
+                    : ""
+                }`}
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("location")}</span>
+              </Button>
+            </Link>
 
             {/* Settings */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200 ${
-                getActiveTab() === "settings" ? "bg-primary/20 text-primary" : ""
-              }`}
-              onClick={() => navigate("/settings")}
-            >
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("settings")}</span>
-            </Button>
+            <Link to="/settings">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`gap-2 hover:bg-primary/20 hover:text-primary transition-all duration-200 ${
+                  getActiveTab() === "settings"
+                    ? "bg-primary/20 text-primary"
+                    : ""
+                }`}
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("settings")}</span>
+              </Button>
+            </Link>
 
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200"
-                >
+                <Button variant="outline" size="sm" className="gap-2">
                   <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline">
-                    {currentLanguage?.native}
-                  </span>
+                  {language === "english" ? "English" : "हिंदी"}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-48 bg-background/95 backdrop-blur-sm border-primary/20"
-              >
-                <DropdownMenuLabel>{t("selectLanguage")}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {languages.map((lang) => (
-                  <DropdownMenuItem
-                    key={lang.code}
-                    onClick={() => handleLanguageSelect(lang.code)}
-                    className={`${
-                      language === lang.code ? "bg-primary/20" : ""
-                    } cursor-pointer hover:bg-primary/20`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{lang.native}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {lang.name}
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() =>
+                    console.log("Language switching not implemented yet")
+                  }
+                >
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    console.log("Language switching not implemented yet")
+                  }
+                >
+                  हिंदी
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Profile */}
-            <Popover open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 hover:bg-primary/20 hover:text-primary hover:translate-y-0.5 transition-all duration-200"
-                >
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {user?.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="hidden sm:inline">{t("profile")}</span>
+            {/* User Account */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Account
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="w-80 bg-background/95 backdrop-blur-sm border-primary/20"
-              >
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">
-                        {t("userProfile")}
-                      </CardTitle>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsEditing(!isEditing)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Avatar */}
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="relative">
-                        <Avatar className="h-16 w-16">
-                          <AvatarImage src={user?.avatar} />
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            {user?.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        {isEditing && (
-                          <label className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer hover:bg-primary/90">
-                            <Camera className="h-3 w-3" />
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleAvatarChange}
-                              className="hidden"
-                            />
-                          </label>
-                        )}
-                      </div>
-                      {!isEditing && (
-                        <div className="text-center">
-                          <h3 className="font-medium">{user?.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {user?.email}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Profile Form */}
-                    {isEditing ? (
-                      <div className="space-y-3">
-                        <div>
-                          <Label htmlFor="name" className="text-xs">
-                            {t("name")}
-                          </Label>
-                          <Input
-                            id="name"
-                            value={editForm.name}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, name: e.target.value })
-                            }
-                            className="h-8"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="email" className="text-xs">
-                            {t("email")}
-                          </Label>
-                          <Input
-                            id="email"
-                            value={editForm.email}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                email: e.target.value,
-                              })
-                            }
-                            className="h-8"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone" className="text-xs">
-                            {t("phone")}
-                          </Label>
-                          <Input
-                            id="phone"
-                            value={editForm.phone}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                phone: e.target.value,
-                              })
-                            }
-                            className="h-8"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="location" className="text-xs">
-                            {t("location")}
-                          </Label>
-                          <Input
-                            id="location"
-                            value={editForm.location}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                location: e.target.value,
-                              })
-                            }
-                            className="h-8"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={handleProfileSave}
-                            className="flex-1"
-                          >
-                            {t("save")}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setIsEditing(false)}
-                            className="flex-1"
-                          >
-                            {t("cancel")}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {t("phone")}:
-                          </span>
-                          <span>{user?.phone}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {t("location")}:
-                          </span>
-                          <span className="text-right flex-1 ml-2">
-                            {user?.location}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {t("selectLanguage")}:
-                          </span>
-                          <span>{currentLanguage?.name}</span>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={signOut}
+                  className="text-destructive"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
