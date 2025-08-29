@@ -89,6 +89,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          notifications: Json
+          preferences: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          notifications: Json
+          preferences: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          notifications?: Json
+          preferences?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weather_history: {
+        Row: {
+          created_at: string
+          id: string
+          recorded_at: string
+          user_id: string
+          weather_data: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recorded_at: string
+          user_id: string
+          weather_data: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recorded_at?: string
+          user_id?: string
+          weather_data?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
