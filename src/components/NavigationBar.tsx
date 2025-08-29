@@ -1,28 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/TranslationContext";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  Menu,
-  MapPin,
-  AlertTriangle,
-  Home,
-  Settings,
-  Globe,
-  LogOut,
-  User,
-} from "lucide-react";
+import { ProfileDropdown } from "../components/ProfileDropdown";
+import { MapPin, AlertTriangle, Home, Settings, Globe } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export const NavigationBar = () => {
-  const { t, language } = useTranslation();
-  const { user, signOut } = useAuth();
+  const { t, language, setLanguage } = useTranslation();
   const location = useLocation();
 
   const getActiveTab = () => {
@@ -125,47 +114,75 @@ export const NavigationBar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Globe className="h-4 w-4" />
-                  {language === "english" ? "English" : "हिंदी"}
+                  {language === "english"
+                    ? "EN"
+                    : language === "hindi"
+                    ? "हि"
+                    : language === "telugu"
+                    ? "తె"
+                    : language === "tamil"
+                    ? "த"
+                    : language === "malayalam"
+                    ? "മ"
+                    : language === "kannada"
+                    ? "ಕ"
+                    : language === "bengali"
+                    ? "বা"
+                    : language === "gujarati"
+                    ? "ગુ"
+                    : language === "marathi"
+                    ? "म"
+                    : language === "punjabi"
+                    ? "ਪੰ"
+                    : language === "odia"
+                    ? "ଓ"
+                    : language === "urdu"
+                    ? "اُ"
+                    : "EN"}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() =>
-                    console.log("Language switching not implemented yet")
-                  }
-                >
+              <DropdownMenuContent className="bg-background border z-50">
+                <DropdownMenuItem onClick={() => setLanguage("english")}>
                   English
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    console.log("Language switching not implemented yet")
-                  }
-                >
-                  हिंदी
+                <DropdownMenuItem onClick={() => setLanguage("hindi")}>
+                  हिंदी (Hindi)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("telugu")}>
+                  తెలుగు (Telugu)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("tamil")}>
+                  தமிழ் (Tamil)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("malayalam")}>
+                  മലയാളം (Malayalam)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("kannada")}>
+                  ಕನ್ನಡ (Kannada)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("bengali")}>
+                  বাংলা (Bengali)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("gujarati")}>
+                  ગુજરાતી (Gujarati)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("marathi")}>
+                  मराठी (Marathi)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("punjabi")}>
+                  ਪੰਜਾਬੀ (Punjabi)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("odia")}>
+                  ଓଡ଼ିଆ (Odia)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("urdu")}>
+                  اردو (Urdu)
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Account */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <User className="h-4 w-4" />
-                  Account
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={signOut}
-                  className="text-destructive"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* User Profile */}
+            <ProfileDropdown />
           </div>
         </div>
       </div>

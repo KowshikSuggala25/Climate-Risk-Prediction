@@ -1,34 +1,180 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Settings as SettingsIcon, Bell, Globe, Thermometer, Shield, Download, Trash2 } from "lucide-react";
-import { useUser } from "@/contexts/UserContext";
+import {
+  Settings as SettingsIcon,
+  Bell,
+  Globe,
+  Thermometer,
+  Shield,
+  Download,
+  Trash2,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
-import { useState } from "react";
+import { settingsService } from "@/services/settingsService";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 
 const Settings = () => {
-  const { user, updateProfile, language, setLanguage } = useUser();
-  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { t, setLanguage } = useTranslation();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    full_name: "",
+    email: "",
+    mobile_number: "",
+  });
+
   const [notifications, setNotifications] = useState({
     weather: true,
     disasters: true,
     air_quality: false,
     email: true,
-    sms: false
+    sms: false,
   });
-  
+
   const [preferences, setPreferences] = useState({
     tempUnit: "celsius",
-    windUnit: "kmh", 
+    windUnit: "kmh",
     precipUnit: "mm",
     timeFormat: "24h",
     autoRefresh: true,
-    darkMode: "system"
+    darkMode: "system",
   });
+
+  const [language, setLanguageState] = useState("english");
+
+  // Load user data on component mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!user) return;
+
+      try {
+        // Load profile data
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        if (profile) {
+          setProfileData({
+            full_name: profile.full_name || "",
+            email: profile.email || "",
+            mobile_number: profile.mobile_number || "",
+          });
+        }
+
+        // Load settings
+        const settings = await settingsService.getUserSettings();
+        if (settings) {
+          setNotifications(settings.notifications);
+          setPreferences(settings.preferences);
+          setLanguageState(settings.language);
+        }
+      } catch (error) {
+        console.error("Failed to load user data:", error);
+      }
+    };
+
+    loadUserData();
+  }, [user]);
+
+  const handleSaveSettings = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not authenticated",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Save profile data
+      await settingsService.updateProfile(profileData);
+
+      // Save settings
+      await settingsService.saveUserSettings({
+        notifications,
+        preferences,
+        language,
+      });
+
+      // Update language in context
+      setLanguage(language);
+
+      toast({
+        title: "Success",
+        description: "Settings saved successfully",
+      });
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      setLoading(true);
+      const data = await settingsService.exportUserData();
+
+      // Create and download file
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `climate-data-export-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Data exported successfully",
+      });
+    } catch (error) {
+      console.error("Failed to export data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to export data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
@@ -58,35 +204,39 @@ const Settings = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input 
-                  id="name" 
-                  value={user?.name || ""} 
-                  onChange={(e) => updateProfile({ name: e.target.value })}
+                <Input
+                  id="name"
+                  value={profileData.full_name}
+                  onChange={(e) =>
+                    setProfileData({
+                      ...profileData,
+                      full_name: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={user?.email || ""}
-                  onChange={(e) => updateProfile({ email: e.target.value })}
+                <Input
+                  id="email"
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, email: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input 
-                  id="phone" 
-                  value={user?.phone || ""}
-                  onChange={(e) => updateProfile({ phone: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input 
-                  id="location" 
-                  value={user?.location || ""}
-                  onChange={(e) => updateProfile({ location: e.target.value })}
+                <Label htmlFor="phone">Mobile Number</Label>
+                <Input
+                  id="phone"
+                  value={profileData.mobile_number}
+                  onChange={(e) =>
+                    setProfileData({
+                      ...profileData,
+                      mobile_number: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -113,14 +263,14 @@ const Settings = () => {
                     Get notified about severe weather conditions
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   checked={notifications.weather}
-                  onCheckedChange={(checked) => 
-                    setNotifications({...notifications, weather: checked})
+                  onCheckedChange={(checked) =>
+                    setNotifications({ ...notifications, weather: checked })
                   }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <p className="font-medium">Disaster Warnings</p>
@@ -128,14 +278,14 @@ const Settings = () => {
                     Critical disaster and emergency notifications
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   checked={notifications.disasters}
-                  onCheckedChange={(checked) => 
-                    setNotifications({...notifications, disasters: checked})
+                  onCheckedChange={(checked) =>
+                    setNotifications({ ...notifications, disasters: checked })
                   }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <p className="font-medium">Air Quality Alerts</p>
@@ -143,14 +293,14 @@ const Settings = () => {
                     Notifications about air quality changes
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   checked={notifications.air_quality}
-                  onCheckedChange={(checked) => 
-                    setNotifications({...notifications, air_quality: checked})
+                  onCheckedChange={(checked) =>
+                    setNotifications({ ...notifications, air_quality: checked })
                   }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <p className="font-medium">Email Notifications</p>
@@ -158,14 +308,14 @@ const Settings = () => {
                     Receive alerts via email
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   checked={notifications.email}
-                  onCheckedChange={(checked) => 
-                    setNotifications({...notifications, email: checked})
+                  onCheckedChange={(checked) =>
+                    setNotifications({ ...notifications, email: checked })
                   }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <p className="font-medium">SMS Notifications</p>
@@ -173,10 +323,10 @@ const Settings = () => {
                     Receive critical alerts via SMS
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   checked={notifications.sms}
-                  onCheckedChange={(checked) => 
-                    setNotifications({...notifications, sms: checked})
+                  onCheckedChange={(checked) =>
+                    setNotifications({ ...notifications, sms: checked })
                   }
                 />
               </div>
@@ -199,10 +349,10 @@ const Settings = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Temperature Unit</Label>
-                <Select 
-                  value={preferences.tempUnit} 
-                  onValueChange={(value) => 
-                    setPreferences({...preferences, tempUnit: value})
+                <Select
+                  value={preferences.tempUnit}
+                  onValueChange={(value) =>
+                    setPreferences({ ...preferences, tempUnit: value })
                   }
                 >
                   <SelectTrigger>
@@ -214,13 +364,13 @@ const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Wind Speed Unit</Label>
-                <Select 
+                <Select
                   value={preferences.windUnit}
-                  onValueChange={(value) => 
-                    setPreferences({...preferences, windUnit: value})
+                  onValueChange={(value) =>
+                    setPreferences({ ...preferences, windUnit: value })
                   }
                 >
                   <SelectTrigger>
@@ -233,13 +383,13 @@ const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Time Format</Label>
-                <Select 
+                <Select
                   value={preferences.timeFormat}
-                  onValueChange={(value) => 
-                    setPreferences({...preferences, timeFormat: value})
+                  onValueChange={(value) =>
+                    setPreferences({ ...preferences, timeFormat: value })
                   }
                 >
                   <SelectTrigger>
@@ -251,13 +401,13 @@ const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Theme</Label>
-                <Select 
+                <Select
                   value={preferences.darkMode}
-                  onValueChange={(value) => 
-                    setPreferences({...preferences, darkMode: value})
+                  onValueChange={(value) =>
+                    setPreferences({ ...preferences, darkMode: value })
                   }
                 >
                   <SelectTrigger>
@@ -271,7 +421,7 @@ const Settings = () => {
                 </Select>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between pt-4">
               <div className="space-y-0.5">
                 <p className="font-medium">Auto-refresh Data</p>
@@ -279,10 +429,10 @@ const Settings = () => {
                   Automatically update weather data every 10 minutes
                 </p>
               </div>
-              <Switch 
+              <Switch
                 checked={preferences.autoRefresh}
-                onCheckedChange={(checked) => 
-                  setPreferences({...preferences, autoRefresh: checked})
+                onCheckedChange={(checked) =>
+                  setPreferences({ ...preferences, autoRefresh: checked })
                 }
               />
             </div>
@@ -304,16 +454,25 @@ const Settings = () => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Interface Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select value={language} onValueChange={setLanguageState}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background z-50">
                     <SelectItem value="english">English</SelectItem>
                     <SelectItem value="telugu">Telugu (తెలుగు)</SelectItem>
                     <SelectItem value="hindi">Hindi (हिंदी)</SelectItem>
                     <SelectItem value="tamil">Tamil (தமிழ்)</SelectItem>
-                    <SelectItem value="malayalam">Malayalam (മലയാളം)</SelectItem>
+                    <SelectItem value="malayalam">
+                      Malayalam (മലയാളം)
+                    </SelectItem>
+                    <SelectItem value="kannada">Kannada (ಕನ್ನಡ)</SelectItem>
+                    <SelectItem value="bengali">Bengali (বাংলা)</SelectItem>
+                    <SelectItem value="gujarati">Gujarati (ગુજરાતી)</SelectItem>
+                    <SelectItem value="marathi">Marathi (मराठी)</SelectItem>
+                    <SelectItem value="punjabi">Punjabi (ਪੰਜਾਬੀ)</SelectItem>
+                    <SelectItem value="odia">Odia (ଓଡ଼ିଆ)</SelectItem>
+                    <SelectItem value="urdu">Urdu (اردو)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -342,7 +501,7 @@ const Settings = () => {
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="font-medium">Location Tracking</p>
@@ -352,11 +511,16 @@ const Settings = () => {
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="pt-4 space-y-2">
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleExportData}
+                disabled={loading}
+              >
                 <Download className="h-4 w-4 mr-2" />
-                Export My Data
+                {loading ? "Exporting..." : "Export My Data"}
               </Button>
               <Button variant="destructive" className="w-full">
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -368,8 +532,13 @@ const Settings = () => {
 
         {/* Save Button */}
         <div className="flex justify-center">
-          <Button size="lg" className="px-8">
-            Save All Settings
+          <Button
+            size="lg"
+            className="px-8"
+            onClick={handleSaveSettings}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save All Settings"}
           </Button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useUser } from "./UserContext";
 interface TranslationContextType {
   t: (key: string) => string;
   language: string;
+  setLanguage: (language: string) => void;
 }
 
 const translations = {
@@ -302,7 +303,7 @@ const TranslationContext = createContext<TranslationContextType | undefined>(
 );
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const { language } = useUser();
+  const { language, setLanguage } = useUser();
 
   const t = (key: string): string => {
     const currentTranslations =
@@ -313,7 +314,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <TranslationContext.Provider value={{ t, language }}>
+    <TranslationContext.Provider value={{ t, language, setLanguage }}>
       {children}
     </TranslationContext.Provider>
   );
